@@ -1,0 +1,666 @@
+:root {
+  --bg: #f7f1ea;
+  --bg-soft: #fffaf5;
+  --surface: rgba(255, 250, 245, 0.78);
+  --surface-strong: #fff9f1;
+  --line: rgba(109, 90, 74, 0.18);
+  --text: #433328;
+  --text-soft: #715d4f;
+  --accent: #9d6f56;
+  --accent-deep: #7c4d39;
+  --accent-mist: rgba(157, 111, 86, 0.12);
+  --reader-luna: #b0727f;
+  --reader-sol: #c38c40;
+  --reader-iris: #7aa0a2;
+  --reader-orion: #8673a5;
+  --shadow: 0 18px 60px rgba(92, 68, 49, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "Source Han Serif SC", serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(222, 196, 176, 0.55), transparent 28%),
+    radial-gradient(circle at top right, rgba(163, 186, 190, 0.34), transparent 26%),
+    linear-gradient(180deg, #fbf6ef 0%, #f4eee6 100%);
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+.page-shell {
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 80px;
+}
+
+.hero,
+.portal-grid,
+.reader-showcase,
+.experience-layout {
+  margin-bottom: 28px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.9fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.hero-copy,
+.hero-panel,
+.portal-card,
+.reader-card,
+.step-card,
+.result-stage,
+.reading-card {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+}
+
+.hero-copy {
+  padding: 36px;
+}
+
+.eyebrow,
+.mini-label,
+.reader-badge,
+.status-tag,
+.source-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrow,
+.mini-label {
+  color: var(--text-soft);
+}
+
+.hero h1,
+.section-heading h2 {
+  margin: 14px 0 14px;
+  line-height: 1.1;
+}
+
+.hero h1 {
+  font-size: clamp(2.6rem, 6vw, 4.8rem);
+}
+
+.hero p,
+.portal-card p,
+.reader-card p,
+.step-tip,
+.reading-section p,
+.note-item p,
+.reading-item p,
+.empty-stage p,
+.shuffle-area p,
+.soft-note {
+  color: var(--text-soft);
+  line-height: 1.75;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-top: 28px;
+}
+
+.daily-guide {
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(109, 90, 74, 0.1);
+}
+
+.hero-panel {
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  min-height: 360px;
+}
+
+.hero-panel::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.32), rgba(157, 111, 86, 0.06));
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.hero-panel-copy,
+.hero-card {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-panel-copy ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+.hero-card {
+  width: 160px;
+  height: 238px;
+  border-radius: 26px;
+}
+
+.hero-card.small {
+  width: 120px;
+  height: 172px;
+}
+
+.tarot-back {
+  position: relative;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.32), transparent 44%),
+    linear-gradient(145deg, #94705b, #67483e);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 0 0 10px rgba(255, 243, 233, 0.11);
+}
+
+.tarot-back::before,
+.tarot-back::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 237, 224, 0.28);
+}
+
+.tarot-back::after {
+  inset: 45px;
+  border-radius: 999px;
+}
+
+.primary-button,
+.ghost-button,
+.chip-button,
+.option-card,
+.spread-card,
+.theme-pill {
+  border: 0;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.primary-button,
+.ghost-button {
+  padding: 14px 22px;
+  border-radius: 999px;
+}
+
+.primary-button {
+  color: white;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  box-shadow: 0 14px 30px rgba(124, 77, 57, 0.22);
+}
+
+.ghost-button {
+  color: var(--accent-deep);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(124, 77, 57, 0.16);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.primary-button:hover,
+.ghost-button:hover,
+.chip-button:hover,
+.option-card:hover,
+.spread-card:hover,
+.theme-pill:hover {
+  transform: translateY(-2px);
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.portal-card,
+.reader-card,
+.step-card,
+.result-stage,
+.reading-card {
+  padding: 24px;
+}
+
+.accent-card {
+  background:
+    linear-gradient(135deg, rgba(176, 114, 127, 0.16), rgba(255, 255, 255, 0.62)),
+    var(--surface);
+}
+
+.portal-card h2,
+.step-card h3,
+.result-stage h3,
+.reading-card h3,
+.reader-card h3 {
+  margin: 0 0 10px;
+}
+
+.chip-list,
+.theme-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chip-button,
+.theme-pill {
+  padding: 10px 14px;
+  border-radius: 999px;
+}
+
+.chip-button {
+  color: var(--text-soft);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(109, 90, 74, 0.14);
+}
+
+.theme-pill {
+  color: var(--text);
+  background: rgba(255, 248, 240, 0.8);
+  border: 1px solid rgba(109, 90, 74, 0.16);
+}
+
+.theme-pill.active,
+.option-card.active,
+.spread-card.active {
+  background: var(--accent-mist);
+  border-color: rgba(124, 77, 57, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(124, 77, 57, 0.18);
+}
+
+.note-list {
+  display: grid;
+  gap: 12px;
+}
+
+.note-item {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.reader-showcase {
+  padding: 18px 0 4px;
+}
+
+.section-heading span {
+  color: var(--text-soft);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.reader-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.reader-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.reader-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--reader-accent) 18%, white), transparent 55%);
+  opacity: 0.8;
+}
+
+.reader-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.reader-badge {
+  color: color-mix(in srgb, var(--reader-accent) 70%, #5f473a);
+  margin-bottom: 14px;
+}
+
+.reader-meta {
+  display: grid;
+  gap: 10px;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.experience-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+  gap: 20px;
+}
+
+.control-panel,
+.result-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.step-title,
+.result-head,
+.reading-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.step-title span:first-child {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  font-size: 13px;
+}
+
+.option-grid,
+.spread-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.option-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.option-card,
+.spread-card {
+  text-align: left;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(109, 90, 74, 0.14);
+}
+
+.option-card strong,
+.spread-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.option-card span,
+.spread-card span,
+.option-card small {
+  display: block;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+.question-box {
+  width: 100%;
+  margin: 18px 0 14px;
+  padding: 18px;
+  resize: vertical;
+  border-radius: 22px;
+  border: 1px solid rgba(109, 90, 74, 0.16);
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--text);
+  outline: none;
+}
+
+.question-box:focus {
+  border-color: rgba(124, 77, 57, 0.4);
+  box-shadow: 0 0 0 4px rgba(157, 111, 86, 0.08);
+}
+
+.error-text {
+  margin: 0 0 12px;
+  color: #a54a4a;
+}
+
+.status-tag,
+.source-tag {
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(109, 90, 74, 0.14);
+  color: var(--text-soft);
+}
+
+.shuffle-area,
+.empty-stage {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 24px 0 10px;
+}
+
+.shuffle-area {
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+}
+
+.shuffle-area p,
+.empty-stage p {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.shuffle-card {
+  width: 130px;
+  height: 190px;
+  border-radius: 24px;
+  animation: shuffleFloat 1.2s ease-in-out infinite;
+}
+
+.shuffle-card:nth-child(2) {
+  animation-delay: 140ms;
+}
+
+.shuffle-card:nth-child(3) {
+  animation-delay: 280ms;
+}
+
+.card-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.card-row.single {
+  grid-template-columns: minmax(0, 240px);
+  justify-content: center;
+}
+
+.drawn-card {
+  padding: 18px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(249, 238, 228, 0.9)),
+    white;
+  border: 1px solid rgba(109, 90, 74, 0.14);
+  animation: riseIn 460ms ease;
+}
+
+.drawn-card-face {
+  min-height: 128px;
+  padding: 18px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top, rgba(157, 111, 86, 0.16), transparent 45%),
+    rgba(255, 249, 241, 0.84);
+  border: 1px solid rgba(109, 90, 74, 0.12);
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.drawn-card-face span,
+.drawn-card-face small {
+  color: var(--text-soft);
+}
+
+.drawn-card p {
+  margin: 14px 0 0;
+  color: var(--text-soft);
+}
+
+.reading-card.muted {
+  background: rgba(255, 248, 241, 0.62);
+}
+
+.reading-topline {
+  align-items: start;
+}
+
+.reading-section + .reading-section {
+  margin-top: 20px;
+}
+
+.reading-section h4 {
+  margin: 0 0 10px;
+}
+
+.reading-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.reading-item {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.reading-item strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.reading-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-soft);
+  line-height: 1.75;
+}
+
+.soft-note {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 246, 235, 0.9);
+}
+
+@keyframes shuffleFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(3deg);
+  }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1080px) {
+  .hero,
+  .experience-grid,
+  .portal-grid,
+  .reader-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-panel {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-shell {
+    width: min(100% - 20px, 1200px);
+    padding-top: 18px;
+  }
+
+  .hero-copy,
+  .portal-card,
+  .reader-card,
+  .step-card,
+  .result-stage,
+  .reading-card {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .hero-actions,
+  .step-title,
+  .result-head,
+  .reading-topline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .option-grid,
+  .card-row,
+  .shuffle-area {
+    grid-template-columns: 1fr;
+  }
+
+  .shuffle-card {
+    margin: 0 auto;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+}
