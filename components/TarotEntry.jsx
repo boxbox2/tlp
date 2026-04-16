@@ -4,21 +4,23 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import firstScene from "@/png/first.png";
+import { readers } from "@/data/readers";
+import { getReaderScene } from "@/data/readerScenes";
 
 const secondVideoSrc = "/video/second.mp4";
 
-const solButtonArea = {
-  left: "56%",
-  top: "72%",
-  width: "13.5%",
-  height: "10.5%"
-};
+const selectableReaders = readers
+  .map((reader) => ({
+    ...reader,
+    scene: getReaderScene(reader.id)
+  }))
+  .filter((reader) => reader.scene);
 
 export default function TarotEntry() {
   const router = useRouter();
   const [scene, setScene] = useState("first");
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isSolHovered, setIsSolHovered] = useState(false);
+  const [hoveredReaderId, setHoveredReaderId] = useState("");
 
   function goToSecondScene() {
     if (isTransitioning) {
@@ -32,8 +34,8 @@ export default function TarotEntry() {
     }, 420);
   }
 
-  function handleSolSelect() {
-    router.push("/transition/sol");
+  function handleReaderSelect(readerId) {
+    router.push(`/transition/${readerId}`);
   }
 
   return (
@@ -78,19 +80,22 @@ export default function TarotEntry() {
             preload="auto"
           />
           <div className="scene-overlay second-overlay second-video-overlay">
-            <button
-              type="button"
-              className={`sol-choice-button ${isSolHovered ? "hovered" : ""}`}
-              style={solButtonArea}
-              onMouseEnter={() => setIsSolHovered(true)}
-              onMouseLeave={() => setIsSolHovered(false)}
-              onFocus={() => setIsSolHovered(true)}
-              onBlur={() => setIsSolHovered(false)}
-              onClick={handleSolSelect}
-              aria-label="选择索尔的指引"
-            >
-              <span className="sol-choice-glow" aria-hidden="true" />
-            </button>
+            {selectableReaders.map((reader) => (
+              <button
+                key={reader.id}
+                type="button"
+                className={`sol-choice-button ${hoveredReaderId === reader.id ? "hovered" : ""}`}
+                style={reader.scene.buttonArea}
+                onMouseEnter={() => setHoveredReaderId(reader.id)}
+                onMouseLeave={() => setHoveredReaderId("")}
+                onFocus={() => setHoveredReaderId(reader.id)}
+                onBlur={() => setHoveredReaderId("")}
+                onClick={() => handleReaderSelect(reader.id)}
+                aria-label={`选择${reader.name}的指引`}
+              >
+                <span className="sol-choice-glow" aria-hidden="true" />
+              </button>
+            ))}
           </div>
         </div>
       </section>

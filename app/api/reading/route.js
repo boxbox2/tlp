@@ -6,7 +6,8 @@ import {
   getReaderById,
   getSpreadById,
   getThemeById,
-  isThemeSupportedByReader
+  isThemeSupportedByReader,
+  normalizeReadingSections
 } from "@/lib/tarot";
 
 export async function POST(request) {
@@ -67,7 +68,7 @@ export async function POST(request) {
         theme,
         reader,
         spread,
-        sections: aiSections
+        sections: normalizeReadingSections(aiSections, fallback.sections)
       });
     } catch (aiError) {
       return NextResponse.json({
