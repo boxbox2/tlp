@@ -1,5 +1,5 @@
-import TarotPortal from "@/components/TarotPortal";
+import TarotEntry from "@/components/TarotEntry";
 
 export default function HomePage() {
-  return <TarotPortal />;
+  return <TarotEntry />;
 }

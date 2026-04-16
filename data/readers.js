@@ -35,7 +35,7 @@ export const readers = [
   {
     id: "orion",
     name: "猎户",
-    title: "星轨讲述人",
+    title: "星轨讲述者",
     themeIds: ["life", "career", "love"],
     specialties: ["生活选择", "事业发展", "爱情关系"],
     color: "var(--reader-orion)",

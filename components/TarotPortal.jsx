@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { readers } from "@/data/readers";
 import { themes } from "@/data/themes";
 import { spreadOptions, getThemesForReader } from "@/lib/tarot";
@@ -45,10 +46,11 @@ function formatTime(value) {
   }).format(new Date(value));
 }
 
-export default function TarotPortal() {
-  const experienceRef = useRef(null);
-  const [selectedReaderId, setSelectedReaderId] = useState(readers[0].id);
-  const [selectedThemeId, setSelectedThemeId] = useState(readers[0].themeIds[0]);
+export default function TarotPortal({ initialReaderId }) {
+  const defaultReader =
+    readers.find((reader) => reader.id === initialReaderId) ?? readers[0];
+  const [selectedReaderId, setSelectedReaderId] = useState(defaultReader.id);
+  const [selectedThemeId, setSelectedThemeId] = useState(defaultReader.themeIds[0]);
   const [spreadId, setSpreadId] = useState("triple");
   const [question, setQuestion] = useState("");
   const [cards, setCards] = useState([]);
@@ -57,12 +59,20 @@ export default function TarotPortal() {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
 
-  const activeReader = readers.find((reader) => reader.id === selectedReaderId) ?? readers[0];
+  const activeReader =
+    readers.find((reader) => reader.id === selectedReaderId) ?? readers[0];
   const availableThemes = getThemesForReader(selectedReaderId);
   const activeTheme =
     themes.find((theme) => theme.id === selectedThemeId) ?? availableThemes[0] ?? themes[0];
   const activeSpread =
     spreadOptions.find((spread) => spread.id === spreadId) ?? spreadOptions[1];
+
+  useEffect(() => {
+    const nextReader =
+      readers.find((reader) => reader.id === initialReaderId) ?? readers[0];
+    setSelectedReaderId(nextReader.id);
+    setSelectedThemeId(nextReader.themeIds[0]);
+  }, [initialReaderId]);
 
   useEffect(() => {
     const nextThemes = getThemesForReader(selectedReaderId);
@@ -97,10 +107,6 @@ export default function TarotPortal() {
     window.localStorage.setItem("tarot-last-reading", JSON.stringify(snapshot));
   }, [reading]);
 
-  function jumpToExperience() {
-    experienceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
   function selectReader(readerId) {
     setSelectedReaderId(readerId);
     setCards([]);
@@ -108,15 +114,9 @@ export default function TarotPortal() {
     setError("");
   }
 
-  function useExampleQuestion(text) {
-    setQuestion(text);
-    jumpToExperience();
-  }
-
   async function handleReading() {
     if (!question.trim()) {
       setError("先写下你现在最想确认的一句话，我们再开始抽牌。");
-      jumpToExperience();
       return;
     }
 
@@ -191,23 +191,22 @@ export default function TarotPortal() {
     setReading(recentReading);
     setError("");
     setStatus("ready");
-    jumpToExperience();
   }
 
   return (
-    <main className="page-shell">
+    <main className="page-shell reading-shell">
       <section className="hero">
         <div className="hero-copy">
           <span className="eyebrow">月汐塔罗 · 轻量陪伴感解读</span>
           <h1>把问题交给牌面，也把答案慢慢还给自己。</h1>
           <p>
-            先选择一位与你气质贴近的占卜师，再进入他真正擅长的主题范围里提问。
-            首版支持单张与三张牌阵，完成后会生成一份中等深度的中文解读。
+            你已经选中了适合自己的占卜师。接下来只需要挑选主题、写下问题，
+            再让牌面替你照亮眼前最想看清的那一小段路。
           </p>
           <div className="hero-actions">
-            <button className="primary-button" type="button" onClick={jumpToExperience}>
-              开始占卜
-            </button>
+            <Link className="ghost-button" href="/">
+              返回入口
+            </Link>
             <div className="daily-guide">
               <strong>{dailyGuide.title}</strong>
               <span>{dailyGuide.line}</span>
@@ -230,10 +229,7 @@ export default function TarotPortal() {
       <section className="portal-grid">
         <article className="portal-card accent-card">
           <h2>占卜入口</h2>
-          <p>从占卜师开始，不同的人有不同的语气、视角和主题边界。</p>
-          <button className="ghost-button" type="button" onClick={jumpToExperience}>
-            去选占卜师
-          </button>
+          <p>先选一位与你当前状态更贴近的占卜师，再进入他真正擅长的主题。</p>
         </article>
         <article className="portal-card">
           <h2>常见提问</h2>
@@ -243,7 +239,7 @@ export default function TarotPortal() {
                 key={item}
                 type="button"
                 className="chip-button"
-                onClick={() => useExampleQuestion(item)}
+                onClick={() => setQuestion(item)}
               >
                 {item}
               </button>
@@ -270,7 +266,11 @@ export default function TarotPortal() {
         </div>
         <div className="reader-grid">
           {readers.map((reader) => (
-            <article key={reader.id} className="reader-card" style={{ "--reader-accent": reader.color }}>
+            <article
+              key={reader.id}
+              className="reader-card"
+              style={{ "--reader-accent": reader.color }}
+            >
               <div className="reader-badge">{reader.title}</div>
               <h3>{reader.name}</h3>
               <p>{reader.intro}</p>
@@ -283,7 +283,7 @@ export default function TarotPortal() {
         </div>
       </section>
 
-      <section className="experience-layout" id="experience" ref={experienceRef}>
+      <section className="experience-layout" id="experience">
         <div className="section-heading">
           <span>开始解读</span>
           <h2>先选占卜师，再进入他擅长的主题</h2>
@@ -317,9 +317,7 @@ export default function TarotPortal() {
                 <span>02</span>
                 <h3>选择主题</h3>
               </div>
-              <p className="step-tip">
-                {activeReader.name} 目前只解读这几个方向：
-              </p>
+              <p className="step-tip">{activeReader.name} 目前只解读这几个方向：</p>
               <div className="theme-row">
                 {availableThemes.map((theme) => (
                   <button
@@ -392,7 +390,9 @@ export default function TarotPortal() {
               <div className="result-head">
                 <div>
                   <span className="mini-label">当前会话</span>
-                  <h3>{activeReader.name} · {activeTheme?.name}</h3>
+                  <h3>
+                    {activeReader.name} · {activeTheme?.name}
+                  </h3>
                 </div>
                 <span className="status-tag">{activeSpread.name}</span>
               </div>
