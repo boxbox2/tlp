@@ -1,5 +1,5 @@
 # 月澜塔罗
-纯Vibe Coding产品，访问https://tlp-neon.vercel.app/ 即可体验 
+纯Vibe Coding产品，访问[月澜塔罗](https://tlp-neon.vercel.app/)即可体验 
 
 一个基于 `Next.js` 的中文塔罗网页原型，主打“轻量陪伴感 + 视觉入口 + 角色化解读”。
 
