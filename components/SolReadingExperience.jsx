@@ -33,6 +33,51 @@ const PHASE_IDLE = "idle";
 const PHASE_DRAWING = "drawing";
 const PHASE_REVEALING = "revealing";
 const PHASE_READY = "ready";
+const DEFAULT_HOURLY_LIMIT = 10;
+
+function formatResetTime(resetAt) {
+  if (!resetAt) {
+    return "一小时后";
+  }
+
+  const date = new Date(resetAt);
+
+  if (Number.isNaN(date.getTime())) {
+    return "一小时后";
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day} ${hour}:${minute}`;
+}
+
+function getQuotaTitle(rateLimit) {
+  if (!rateLimit) {
+    return `最近 60 分钟剩余 ${DEFAULT_HOURLY_LIMIT} 次`;
+  }
+
+  if (rateLimit.remaining <= 0) {
+    return "最近 60 分钟询问次数已用完";
+  }
+
+  return `最近 60 分钟剩余 ${rateLimit.remaining} 次`;
+}
+
+function getQuotaDescription(rateLimit) {
+  if (!rateLimit) {
+    return `最近 60 分钟内最多可提问 ${DEFAULT_HOURLY_LIMIT} 次，完成一次解读后会自动扣减。`;
+  }
+
+  if (rateLimit.remaining <= 0) {
+    return `塔罗牌正在积蓄能量，请于 ${formatResetTime(rateLimit.resetAt)} 后再来。`;
+  }
+
+  return `最近 60 分钟内最多可提问 ${rateLimit.limit ?? DEFAULT_HOURLY_LIMIT} 次，当前还可继续解读 ${rateLimit.remaining} 次。`;
+}
 
 function getStatusCopy(readerName, phase, readingReady) {
   if (phase === PHASE_DRAWING) {
@@ -71,6 +116,7 @@ export default function SolReadingExperience({ readerId = "sol" }) {
   const [readingDone, setReadingDone] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rateLimit, setRateLimit] = useState(null);
   const timersRef = useRef([]);
 
   useEffect(() => {
@@ -92,6 +138,10 @@ export default function SolReadingExperience({ readerId = "sol" }) {
     setPhase(PHASE_READY);
   }, [animationDone, reading, readingDone]);
 
+  useEffect(() => {
+    void syncRateLimit();
+  }, []);
+
   const activeTheme =
     readerThemes.find((theme) => theme.id === selectedThemeId) ?? readerThemes[0];
   const activeSpread =
@@ -99,6 +149,9 @@ export default function SolReadingExperience({ readerId = "sol" }) {
   const statusCopy = getStatusCopy(reader.name, phase, readingDone);
   const readingSections = reading?.sections ?? {};
   const readerReply = readingSections.readerMessage ?? readingSections.opening;
+  const isRateLimited = (rateLimit?.remaining ?? DEFAULT_HOURLY_LIMIT) <= 0;
+  const quotaTitle = getQuotaTitle(rateLimit);
+  const quotaDescription = getQuotaDescription(rateLimit);
 
   const cardSlots = useMemo(() => {
     if (cards.length > 0) {
@@ -119,6 +172,24 @@ export default function SolReadingExperience({ readerId = "sol" }) {
   function clearTimers() {
     timersRef.current.forEach((timer) => clearTimeout(timer));
     timersRef.current = [];
+  }
+
+  async function syncRateLimit() {
+    try {
+      const response = await fetch("/api/reading", {
+        cache: "no-store"
+      });
+      const payload = await response.json();
+
+      if (response.ok && payload?.rateLimit) {
+        setRateLimit(payload.rateLimit);
+        return payload.rateLimit;
+      }
+    } catch (syncError) {
+      return null;
+    }
+
+    return null;
   }
 
   function resetConversation({ keepQuestion = false } = {}) {
@@ -164,6 +235,14 @@ export default function SolReadingExperience({ readerId = "sol" }) {
       return;
     }
 
+    const latestRateLimit = (await syncRateLimit()) ?? rateLimit;
+
+    if ((latestRateLimit?.remaining ?? DEFAULT_HOURLY_LIMIT) <= 0) {
+      setRateLimit(latestRateLimit);
+      setError(getQuotaDescription(latestRateLimit));
+      return;
+    }
+
     resetConversation({ keepQuestion: true });
     setSubmittedQuestion(trimmedQuestion);
     setPhase(PHASE_DRAWING);
@@ -202,7 +281,15 @@ export default function SolReadingExperience({ readerId = "sol" }) {
       });
       const readingPayload = await readingResponse.json();
 
+      if (readingPayload?.rateLimit) {
+        setRateLimit(readingPayload.rateLimit);
+      }
+
       if (!readingResponse.ok) {
+        if (readingResponse.status === 429 && readingPayload?.rateLimit) {
+          throw new Error(getQuotaDescription(readingPayload.rateLimit));
+        }
+
         throw new Error(readingPayload.error || "解读生成失败，请稍后再试。");
       }
 
@@ -367,6 +454,12 @@ export default function SolReadingExperience({ readerId = "sol" }) {
                   </p>
                 </div>
 
+                <article className={`sol-quota-panel ${isRateLimited ? "limited" : ""}`}>
+                  <span className="sol-bubble-label">能量额度</span>
+                  <strong>{quotaTitle}</strong>
+                  <p>{quotaDescription}</p>
+                </article>
+
                 <div className="sol-control-group">
                   <span>主题</span>
                   <div className="theme-row">
@@ -427,9 +520,13 @@ export default function SolReadingExperience({ readerId = "sol" }) {
                   type="button"
                   className="primary-button sol-send-button compact"
                   onClick={handleSend}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isRateLimited}
                 >
-                  {isSubmitting ? "牌面展开中..." : `发送给 ${reader.name}`}
+                  {isRateLimited
+                    ? "塔罗牌正在积蓄能量"
+                    : isSubmitting
+                      ? "牌面展开中..."
+                      : `发送给 ${reader.name}`}
                 </button>
               </div>
             ) : (
@@ -444,6 +541,12 @@ export default function SolReadingExperience({ readerId = "sol" }) {
                     <p>{readerReply ?? "角色正在把牌面和你的问题重新组织成更清楚的话语。"}</p>
                   </article>
                 </div>
+
+                <article className={`sol-quota-panel ${isRateLimited ? "limited" : ""}`}>
+                  <span className="sol-bubble-label">剩余次数</span>
+                  <strong>{quotaTitle}</strong>
+                  <p>{quotaDescription}</p>
+                </article>
 
                 <div className="sol-result-block hero">
                   <span className="sol-bubble-label">整体判断</span>

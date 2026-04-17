@@ -864,6 +864,36 @@ textarea {
   gap: 16px;
 }
 
+.sol-quota-panel {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 219, 169, 0.14);
+  background:
+    radial-gradient(circle at top right, rgba(255, 209, 120, 0.1), transparent 30%),
+    linear-gradient(180deg, rgba(23, 14, 20, 0.78), rgba(23, 14, 20, 0.58));
+}
+
+.sol-quota-panel.limited {
+  border-color: rgba(255, 184, 167, 0.22);
+  background:
+    radial-gradient(circle at top right, rgba(255, 176, 116, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(37, 16, 18, 0.84), rgba(27, 12, 18, 0.68));
+}
+
+.sol-quota-panel strong {
+  color: #fff3dc;
+  font-size: 1.02rem;
+}
+
+.sol-quota-panel p {
+  margin: 0;
+  color: rgba(247, 234, 212, 0.8);
+  line-height: 1.62;
+  font-size: 13px;
+}
+
 .sol-result-card {
   display: grid;
   align-content: start;
